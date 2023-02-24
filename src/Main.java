@@ -1,15 +1,45 @@
-import java.net.SocketOption;
+import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        // Список возможных продуктов
+        String[] products = {
+                "Молоко", "Хлеб", "Сыр", "Яйца", "Гречка", "Мука", "Макароны", "Курица", "Картошка", "Яблоки"
+        };
+        //Список цен на продукты
+        int[] prices = {60, 50, 150, 80, 90, 120, 100, 200, 45, 130};
+
+        // При старте программа должна искать этот файл в корне проекта
+        File myFile = new File("basket.txt");
+        //Создаем пустую корзину
+        Basket basket = new Basket(prices, products);
+        // и если он находится,
+        if (myFile.exists())
+        // восстанавливать корзину из него;
+        {
+            basket.loadFromTxtFile(myFile);
+        }
+        // если файл не найдет,
+        else
+        // то стоит начать с пустой корзины
+        {
+            try {
+                if (myFile.createNewFile()) //Создаем файл basket.txt
+                {
+                    System.out.println("Файл был создан");
+
+                }
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
         int sumProducts = 0;
         Scanner scanner = new Scanner(System.in);
-        String[] products = {
-                "Молоко 1л", "Хлеб", "Сыр 200 гр", "Яйца 10 шт", "Гречка 1 кг", "Мука 1 кг", "Макароны 800 гр", "Курица 1кг", "Картошка 1 кг", "Яблоки 1 кг"
-        };
-        int[] prices = {60, 50, 150, 80, 90, 120, 100, 200, 45, 130};
+
         int[] productsCount = new int[10];
+
         System.out.println("Список возможных товаров для покупки");
         for (int i = 0; i < products.length; i++) {
             System.out.println(i + 1 + "  " + products[i] + "  " + prices[i] + " руб/шт");
@@ -20,24 +50,18 @@ public class Main {
             String input = scanner.nextLine();
             if ("end".equals(input)) {
                 if (sumProducts > 0) {
-                    System.out.println("Ваша корзина:");
-                    for (int j = 0; j < products.length; j++) {
-                        if (productsCount[j] > 0) {
-                            System.out.println(products[j] + " " + productsCount[j] + " шт " + prices[j] + " руб/шт " + prices[j] * productsCount[j] + " руб. в сумме");
-                        }
-                        ;
-                    }
-                    ;
-                    System.out.println("Итого: " + sumProducts + " руб");
+                    basket.printCart();
                 }
-                ;
                 break;
             }
-            ;
+
             String[] parts = input.split(" ");
             int number = Integer.parseInt(parts[0]) - 1;
             int count = Integer.parseInt(parts[1]);
-            productsCount[number] = productsCount[number] + count;
+            basket.addToCart(Integer.parseInt(parts[0]), count);
+            //После ввода каждой покупки пользователем вам следует
+            // сохранять пользовательскую корзину в файл basket.txt
+            basket.saveTxt(myFile);
             sumProducts = sumProducts + prices[number] * count;
         }
     }
