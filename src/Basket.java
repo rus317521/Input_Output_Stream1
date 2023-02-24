@@ -1,9 +1,9 @@
 import java.io.*;
 
-public class Basket {
+public class Basket implements Serializable {
     protected static int[] prices; //Цены
     protected static String[] productsInBasket; //Названия продуктов
-    protected static int[] amountProduct; //Количество продуктов
+    protected int[] amountProduct; //Количество продуктов
 
     //конструктор, принимающий массив цен и названий продуктов;
     public Basket(int[] prices, String[] productsInBasket) {
@@ -14,6 +14,13 @@ public class Basket {
         for (int i = 0; i < productsInBasket.length; i++) {
             amountProduct[i] = 0;
         }
+
+    }
+
+    public Basket(int[] prices, String[] productsInBasket, int[] amountProduct) {
+        this.prices = prices;
+        this.productsInBasket = productsInBasket;
+        this.amountProduct = amountProduct;
 
     }
 
@@ -38,8 +45,8 @@ public class Basket {
     // использовать встроенные сериализаторы нельзя;
     public void saveTxt(File textFile) {
         try (FileWriter writer = new FileWriter(textFile)
-           //  FileReader inputStream = new FileReader(textFile)
-             ) {
+             //  FileReader inputStream = new FileReader(textFile)
+        ) {
             //Продукты
             for (int j = 0; j < productsInBasket.length; j++) {
                 if (amountProduct[j] > 0) {
@@ -58,7 +65,7 @@ public class Basket {
             //Количество товара
             for (int j = 0; j < amountProduct.length; j++) {
                 if (amountProduct[j] > 0) {
-                    writer.write(amountProduct[j] + " " );
+                    writer.write(amountProduct[j] + " ");
                 }
 
             }
@@ -84,8 +91,8 @@ public class Basket {
     //static Basket loadFromTxtFile(File textFile) - статический(!)
     // метод восстановления объекта корзины из текстового файла,
     // в который ранее была она сохранена;
-    public static Basket loadFromTxtFile(File textFile)
-    {   int ap = prices.length;
+    public static Basket loadFromTxtFile(File textFile) {
+        int ap = prices.length;
         String[] pricesBstr = new String[ap]; //Цены String
         int[] pricesB = new int[ap]; //Цены int
         String[] amountBstr = new String[ap]; //Количество  String
@@ -103,13 +110,11 @@ public class Basket {
             String amountStr;
             String sumPriseStr;
 
-            if((productStr = br.readLine()) != null)
-            {   //productStr = br.readLine();
+            if ((productStr = br.readLine()) != null) {   //productStr = br.readLine();
                 productsInBasketB = productStr.split(" ");
-               //Восстановить массив продуктов
+                //Восстановить массив продуктов
             }
-            if((priseStr = br.readLine()) != null)
-           {
+            if ((priseStr = br.readLine()) != null) {
                 if ((amountStr = br.readLine()) != null) {  // amountStr = br.readLine();
                     amountBstr = amountStr.split(" ");
                     for (int l = 0; l < amountBstr.length; l++) {
@@ -122,19 +127,42 @@ public class Basket {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-        for(int i = 0; i < productsInBasket.length; i++)
-        {
-            for(int j = 0; j < productsInBasketB.length; j++)
-            {
-                if(productsInBasket[i].equals(productsInBasketB[j]))
-                {
-                    basket.addToCart(i+1,amountB[j]);
-                     }
+        for (int i = 0; i < productsInBasket.length; i++) {
+            for (int j = 0; j < productsInBasketB.length; j++) {
+                if (productsInBasket[i].equals(productsInBasketB[j])) {
+                    basket.addToCart(i + 1, amountB[j]);
+                }
 
             }
         }
 
         return basket;
+    }
+
+    public void saveBin(File file) {
+        try (FileOutputStream fos = new FileOutputStream(file);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            // запишем экземпляр класса в файл
+            Basket basket = new Basket(prices, productsInBasket, amountProduct);
+            oos.writeObject(basket);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static Basket loadFromBinFile(File file) {
+        Basket basket = null;
+// откроем входной поток для чтения файла
+        try (FileInputStream fis = new FileInputStream(file);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            // десериализуем объект и скастим его в класс
+            basket = (Basket) ois.readObject();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        System.out.println(basket);
+        return basket;
+
     }
 
     //геттеры, которые вы посчитаете нужными.

@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
@@ -12,29 +11,20 @@ public class Main {
         int[] prices = {60, 50, 150, 80, 90, 120, 100, 200, 45, 130};
 
         // При старте программа должна искать этот файл в корне проекта
-        File myFile = new File("basket.txt");
+        File myFile = new File("basket.bin");
         //Создаем пустую корзину
         Basket basket = new Basket(prices, products);
         // и если он находится,
         if (myFile.exists())
         // восстанавливать корзину из него;
         {
-            basket.loadFromTxtFile(myFile);
-        }
-        // если файл не найдет,
-        else
-        // то стоит начать с пустой корзины
-        {
-            try {
-                if (myFile.createNewFile()) //Создаем файл basket.txt
-                {
-                    System.out.println("Файл был создан");
 
-                }
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            }
+            Basket basketN = basket.loadFromBinFile(myFile);
+            System.out.println("Восстановленная из файла корзина:");
+            basketN.printCart();
+            basket = basketN;
         }
+
         int sumProducts = 0;
         Scanner scanner = new Scanner(System.in);
 
@@ -61,7 +51,8 @@ public class Main {
             basket.addToCart(Integer.parseInt(parts[0]), count);
             //После ввода каждой покупки пользователем вам следует
             // сохранять пользовательскую корзину в файл basket.txt
-            basket.saveTxt(myFile);
+            basket.saveBin(myFile);
+            //basket.printCart();
             sumProducts = sumProducts + prices[number] * count;
         }
     }
