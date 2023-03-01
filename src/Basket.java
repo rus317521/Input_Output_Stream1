@@ -1,9 +1,9 @@
 import java.io.*;
 
 public class Basket {
-    protected  int[] prices; //Цены
-    protected  String[] productsInBasket; //Названия продуктов
-    protected  int[] amountProduct; //Количество продуктов
+    protected int[] prices; //Цены
+    protected String[] productsInBasket; //Названия продуктов
+    protected int[] amountProduct; //Количество продуктов
 
     //конструктор, принимающий массив цен и названий продуктов;
     public Basket(int[] prices, String[] productsInBasket) {
@@ -46,9 +46,11 @@ public class Basket {
     public void saveTxt(File textFile) {
         try (FileWriter writer = new FileWriter(textFile)
              //  FileReader inputStream = new FileReader(textFile)
-        ) { int countProduct = 0;
-            for(int i = 0; i< productsInBasket.length; i++)
-            { if (amountProduct[i] > 0) countProduct++;}
+        ) {
+            int countProduct = 0;
+            for (int i = 0; i < productsInBasket.length; i++) {
+                if (amountProduct[i] > 0) countProduct++;
+            }
             writer.write(countProduct + "\n");
 
             //Продукты
