@@ -1,9 +1,9 @@
 import java.io.*;
 
 public class Basket {
-    protected static int[] prices; //Цены
-    protected static String[] productsInBasket; //Названия продуктов
-    protected static int[] amountProduct; //Количество продуктов
+    protected  int[] prices; //Цены
+    protected  String[] productsInBasket; //Названия продуктов
+    protected  int[] amountProduct; //Количество продуктов
 
     //конструктор, принимающий массив цен и названий продуктов;
     public Basket(int[] prices, String[] productsInBasket) {
@@ -14,6 +14,13 @@ public class Basket {
         for (int i = 0; i < productsInBasket.length; i++) {
             amountProduct[i] = 0;
         }
+
+    }
+
+    public Basket(int[] prices, String[] productsInBasket, int[] amountProduct) {
+        this.prices = prices;
+        this.productsInBasket = productsInBasket;
+        this.amountProduct = amountProduct;
 
     }
 
@@ -38,8 +45,12 @@ public class Basket {
     // использовать встроенные сериализаторы нельзя;
     public void saveTxt(File textFile) {
         try (FileWriter writer = new FileWriter(textFile)
-           //  FileReader inputStream = new FileReader(textFile)
-             ) {
+             //  FileReader inputStream = new FileReader(textFile)
+        ) { int countProduct = 0;
+            for(int i = 0; i< productsInBasket.length; i++)
+            { if (amountProduct[i] > 0) countProduct++;}
+            writer.write(countProduct + "\n");
+
             //Продукты
             for (int j = 0; j < productsInBasket.length; j++) {
                 if (amountProduct[j] > 0) {
@@ -58,7 +69,7 @@ public class Basket {
             //Количество товара
             for (int j = 0; j < amountProduct.length; j++) {
                 if (amountProduct[j] > 0) {
-                    writer.write(amountProduct[j] + " " );
+                    writer.write(amountProduct[j] + " ");
                 }
 
             }
@@ -84,17 +95,13 @@ public class Basket {
     //static Basket loadFromTxtFile(File textFile) - статический(!)
     // метод восстановления объекта корзины из текстового файла,
     // в который ранее была она сохранена;
-    public static Basket loadFromTxtFile(File textFile)
-    {   int ap = prices.length;
-        String[] pricesBstr = new String[ap]; //Цены String
-        int[] pricesB = new int[ap]; //Цены int
-        String[] amountBstr = new String[ap]; //Количество  String
-        int[] amountB = new int[ap]; //Количество  int
-        String[] pricesBsumStr = new String[ap]; //суммарные Цены String
-        int[] pricesBsum = new int[ap]; //Суммарные Цены int
-        String[] productsInBasketB = new String[ap]; //Названия продуктов
-
-        Basket basket = new Basket(prices, productsInBasket);
+    public static Basket loadFromTxtFile(File textFile) {
+        int sizeBasket = 0;
+        String sizeBasketStr;
+        String[] productsInBasketB = null;
+        int[] amountB = null;
+        Basket basket = null;
+        int[] pricesB = null;
 
         try (BufferedReader br = new BufferedReader(new FileReader(textFile))) {
             //чтение построчно
@@ -102,36 +109,50 @@ public class Basket {
             String priseStr;
             String amountStr;
             String sumPriseStr;
+            //Считываем размер корзины
+            if ((sizeBasketStr = br.readLine()) != null) {
+                sizeBasket = Integer.parseInt(sizeBasketStr);
+                //Восстановить массив продуктов
+            }
 
-            if((productStr = br.readLine()) != null)
-            {   //productStr = br.readLine();
+            int ap = sizeBasket;
+            String[] pricesBstr = new String[ap]; //Цены String
+            pricesB = new int[ap]; //Цены int
+            String[] amountBstr = new String[ap]; //Количество  String
+            amountB = new int[ap]; //Количество  int
+            String[] pricesBsumStr = new String[ap]; //суммарные Цены String
+            int[] pricesBsum = new int[ap]; //Суммарные Цены int
+            productsInBasketB = new String[ap]; //Названия продуктов
+
+
+            //Читаем строку с продуктами
+            if ((productStr = br.readLine()) != null) {   //productStr = br.readLine();
                 productsInBasketB = productStr.split(" ");
-               //Восстановить массив продуктов
+                //Восстановить массив продуктов
             }
-            if((priseStr = br.readLine()) != null)
-           {
-                if ((amountStr = br.readLine()) != null) {  // amountStr = br.readLine();
-                    amountBstr = amountStr.split(" ");
-                    for (int l = 0; l < amountBstr.length; l++) {
-                        amountB[l] = Integer.parseInt(amountBstr[l]);
-                    }
-
+            //Цены на продукты
+            if ((priseStr = br.readLine()) != null) {
+                pricesBstr = priseStr.split(" ");
+                for (int l = 0; l < pricesBstr.length; l++) {
+                    pricesB[l] = Integer.parseInt(pricesBstr[l]);
                 }
+
+
             }
+            //Количество продуктов
+            if ((amountStr = br.readLine()) != null) {  // amountStr = br.readLine();
+                amountBstr = amountStr.split(" ");
+                for (int l = 0; l < amountBstr.length; l++) {
+                    amountB[l] = Integer.parseInt(amountBstr[l]);
+                }
+
+            }
+
+            basket = new Basket(pricesB, productsInBasketB, amountB);
+            //  return basket;
 
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-        }
-        for(int i = 0; i < productsInBasket.length; i++)
-        {
-            for(int j = 0; j < productsInBasketB.length; j++)
-            {
-                if(productsInBasket[i].equals(productsInBasketB[j]))
-                {
-                    basket.addToCart(i+1,amountB[j]);
-                     }
-
-            }
         }
 
         return basket;

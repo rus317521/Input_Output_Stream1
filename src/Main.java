@@ -19,7 +19,17 @@ public class Main {
         if (myFile.exists())
         // восстанавливать корзину из него;
         {
-            basket.loadFromTxtFile(myFile);
+            Basket basketN = basket.loadFromTxtFile(myFile);
+            basketN.printCart();
+            //++++++++
+            for (int i = 0; i < basket.getproductsInBasket().length; i++) {
+                for (int j = 0; j < basketN.productsInBasket.length; j++) {
+                    if (basket.getproductsInBasket()[i].equals(basketN.getproductsInBasket()[j])) {
+                        basket.addToCart(i + 1, basketN.getAmountProduct()[j]);
+                    }
+                }
+            }
+            //++++++++++
         }
         // если файл не найдет,
         else
